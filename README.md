@@ -91,6 +91,8 @@ In initializer  `config/initializers/devise.rb` :
   * When set to true, the admin user will be used to bind to the LDAP server during authentication.
 * `ldap_check_group_membership_without_admin` _(default: false)_
   * When set to true, the group membership check is done with the user's own credentials rather than with admin credentials. Since these credentials are only available to the Devise user model during the login flow, the group check function will not work if a group check is performed when this option is true outside of the login flow (e.g., before particular actions).
+* `ldap_connect_timeout` _(default: `::Net::LDAP::Connection::DefaultConnectTimeout` = 5)_
+  * Used to set the connect timeout for server connection, see [Net::LDAP::Connection](https://www.rubydoc.info/github/ruby-ldap/ruby-net-ldap/Net/LDAP/Connection)
 
 Advanced Configuration
 ----------------------

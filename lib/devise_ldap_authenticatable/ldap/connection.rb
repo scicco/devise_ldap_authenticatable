@@ -7,7 +7,11 @@ module Devise
         if ::Devise.ldap_config.is_a?(Proc)
           ldap_config = ::Devise.ldap_config.call
         else
-          ldap_config = YAML.load(ERB.new(File.read(::Devise.ldap_config || "#{Rails.root}/config/ldap.yml")).result)[Rails.env]
+          begin
+            ldap_config = YAML.load(ERB.new(File.read(::Devise.ldap_config || "#{Rails.root}/config/ldap.yml")).result)[Rails.env]
+          rescue Psych::AliasesNotEnabled
+            ldap_config = YAML.load(ERB.new(File.read(::Devise.ldap_config || "#{Rails.root}/config/ldap.yml")).result, aliases: true)[Rails.env]
+          end
         end
         ldap_options = params
 
@@ -15,7 +19,7 @@ module Devise
         ldap_config["ssl"] = :simple_tls if ldap_config["ssl"] === true
         ldap_options[:encryption] = ldap_config["ssl"].to_sym if ldap_config["ssl"]
         ldap_options[:encryption] = ldap_config["encryption"] if ldap_config["encryption"]
-
+        ldap_options[:connect_timeout] = ldap_config["connect_timeout"] if ldap_config["connect_timeout"]
         @ldap = Net::LDAP.new(ldap_options)
         @ldap.host = ldap_config["host"]
         @ldap.port = ldap_config["port"]
